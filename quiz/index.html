@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IoT Quiz Master — NPTEL IIOT</title>
+<meta name="description" content="Interactive IoT Quiz covering NPTEL IIOT assignments from 2024, 2025, and 2026. Test your knowledge with multiple quiz modes.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg-primary:#0a0e1a;
+--bg-card:#111827;
+--bg-card-hover:#1a2332;
+--surface:#1e293b;
+--surface-hover:#2d3b4f;
+--accent:#6366f1;
+--accent-glow:rgba(99,102,241,0.3);
+--accent-light:#818cf8;
+--green:#22c55e;
+--green-glow:rgba(34,197,94,0.2);
+--red:#ef4444;
+--red-glow:rgba(239,68,68,0.2);
+--yellow:#eab308;
+--text-primary:#f1f5f9;
+--text-secondary:#94a3b8;
+--text-muted:#64748b;
+--border:rgba(255,255,255,0.06);
+--radius:16px;
+--radius-sm:10px;
+--transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{
+font-family:'Inter',sans-serif;
+background:var(--bg-primary);
+color:var(--text-primary);
+min-height:100vh;
+overflow-x:hidden;
+line-height:1.6;
+}
+body::before{
+content:'';
+position:fixed;
+inset:0;
+background:
+  radial-gradient(ellipse 80% 60% at 50% -20%,rgba(99,102,241,0.12),transparent),
+  radial-gradient(ellipse 60% 50% at 80% 100%,rgba(139,92,246,0.08),transparent),
+  radial-gradient(ellipse 50% 40% at 10% 60%,rgba(59,130,246,0.06),transparent);
+pointer-events:none;
+z-index:0;
+}
+.app{
+position:relative;
+z-index:1;
+max-width:800px;
+margin:0 auto;
+padding:24px 20px;
+min-height:100vh;
+display:flex;
+flex-direction:column;
+}
+.screen{display:none;animation:fadeSlide 0.5s ease forwards}
+.screen.active{display:flex;flex-direction:column}
+@keyframes fadeSlide{
+from{opacity:0;transform:translateY(20px)}
+to{opacity:1;transform:translateY(0)}
+}
+@keyframes pulse{
+0%,100%{box-shadow:0 0 0 0 var(--accent-glow)}
+50%{box-shadow:0 0 0 12px transparent}
+}
+@keyframes shimmer{
+0%{background-position:-200% 0}
+100%{background-position:200% 0}
+}
+@keyframes countUp{
+from{transform:scale(0.5);opacity:0}
+to{transform:scale(1);opacity:1}
+}
+.logo{
+display:flex;
+align-items:center;
+gap:14px;
+margin-bottom:12px;
+}
+.logo-icon{
+width:52px;height:52px;
+border-radius:14px;
+background:linear-gradient(135deg,var(--accent),#8b5cf6);
+display:flex;align-items:center;justify-content:center;
+font-size:24px;
+box-shadow:0 8px 32px rgba(99,102,241,0.3);
+}
+.logo-text h1{
+font-size:1.6rem;
+font-weight:800;
+background:linear-gradient(135deg,#fff,var(--accent-light));
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+letter-spacing:-0.5px;
+}
+.logo-text p{
+font-size:0.78rem;
+color:var(--text-muted);
+font-weight:500;
+letter-spacing:0.5px;
+text-transform:uppercase;
+}
+.hero-subtitle{
+font-size:1rem;
+color:var(--text-secondary);
+margin-bottom:32px;
+line-height:1.7;
+}
+.hero-subtitle strong{color:var(--accent-light)}
+.stats-row{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+margin-bottom:36px;
+}
+.stat-card{
+background:var(--bg-card);
+border:1px solid var(--border);
+border-radius:var(--radius-sm);
+padding:16px 12px;
+text-align:center;
+transition:var(--transition);
+}
+.stat-card:hover{
+border-color:rgba(99,102,241,0.3);
+transform:translateY(-2px);
+}
+.stat-number{
+font-size:1.6rem;
+font-weight:800;
+color:var(--accent-light);
+}
+.stat-label{
+font-size:0.7rem;
+color:var(--text-muted);
+text-transform:uppercase;
+letter-spacing:0.8px;
+margin-top:4px;
+font-weight:600;
+}
+.section-title{
+font-size:0.75rem;
+font-weight:700;
+color:var(--text-muted);
+text-transform:uppercase;
+letter-spacing:1.2px;
+margin-bottom:14px;
+}
+.mode-grid{
+display:flex;
+flex-direction:column;
+gap:12px;
+margin-bottom:24px;
+}
+.mode-card{
+background:var(--bg-card);
+border:1px solid var(--border);
+border-radius:var(--radius);
+padding:20px 22px;
+cursor:pointer;
+transition:var(--transition);
+display:flex;
+align-items:center;
+gap:16px;
+position:relative;
+overflow:hidden;
+}
+.mode-card::before{
+content:'';
+position:absolute;
+inset:0;
+background:linear-gradient(135deg,rgba(99,102,241,0.05),transparent);
+opacity:0;
+transition:var(--transition);
+}
+.mode-card:hover{
+border-color:rgba(99,102,241,0.4);
+transform:translateY(-2px);
+box-shadow:0 12px 40px rgba(0,0,0,0.3);
+}
+.mode-card:hover::before{opacity:1}
+.mode-card:active{transform:translateY(0)}
+.mode-icon{
+width:48px;height:48px;
+border-radius:12px;
+display:flex;align-items:center;justify-content:center;
+font-size:22px;
+flex-shrink:0;
+}
+.mode-icon.purple{background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(99,102,241,0.1))}
+.mode-icon.blue{background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(99,102,241,0.1))}
+.mode-icon.teal{background:linear-gradient(135deg,rgba(20,184,166,0.2),rgba(59,130,246,0.1))}
+.mode-info h3{
+font-size:1rem;
+font-weight:700;
+margin-bottom:3px;
+}
+.mode-info p{
+font-size:0.8rem;
+color:var(--text-muted);
+line-height:1.5;
+}
+.year-selector{
+display:none;
+flex-direction:column;
+gap:10px;
+margin-top:12px;
+animation:fadeSlide 0.3s ease;
+}
+.year-selector.visible{display:flex}
+.year-btn{
+background:var(--surface);
+border:1px solid var(--border);
+border-radius:var(--radius-sm);
+padding:14px 18px;
+color:var(--text-primary);
+font-family:inherit;
+font-size:0.9rem;
+font-weight:600;
+cursor:pointer;
+transition:var(--transition);
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+.year-btn:hover{
+border-color:var(--accent);
+background:var(--surface-hover);
+}
+.year-btn .badge{
+background:rgba(99,102,241,0.15);
+color:var(--accent-light);
+padding:4px 10px;
+border-radius:20px;
+font-size:0.72rem;
+font-weight:700;
+}
+.quiz-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+padding-bottom:16px;
+border-bottom:1px solid var(--border);
+}
+.quiz-meta{display:flex;align-items:center;gap:10px}
+.year-badge{
+background:linear-gradient(135deg,var(--accent),#8b5cf6);
+padding:5px 14px;
+border-radius:20px;
+font-size:0.72rem;
+font-weight:700;
+letter-spacing:0.5px;
+}
+.progress-text{
+font-size:0.82rem;
+color:var(--text-secondary);
+font-weight:600;
+}
+.score-display{
+font-size:0.82rem;
+color:var(--green);
+font-weight:700;
+display:flex;align-items:center;gap:6px;
+}
+.progress-bar-container{
+width:100%;
+height:5px;
+background:var(--surface);
+border-radius:10px;
+margin-bottom:28px;
+overflow:hidden;
+}
+.progress-bar{
+height:100%;
+background:linear-gradient(90deg,var(--accent),#8b5cf6);
+border-radius:10px;
+transition:width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.question-card{
+background:var(--bg-card);
+border:1px solid var(--border);
+border-radius:var(--radius);
+padding:28px 24px;
+margin-bottom:20px;
+}
+.question-text{
+font-size:1.05rem;
+font-weight:600;
+line-height:1.7;
+margin-bottom:24px;
+color:var(--text-primary);
+}
+.options-list{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+.option-btn{
+background:var(--surface);
+border:2px solid var(--border);
+border-radius:var(--radius-sm);
+padding:15px 18px;
+color:var(--text-primary);
+font-family:inherit;
+font-size:0.9rem;
+font-weight:500;
+cursor:pointer;
+transition:var(--transition);
+text-align:left;
+line-height:1.5;
+display:flex;
+align-items:flex-start;
+gap:12px;
+position:relative;
+}
+.option-btn .opt-label{
+width:28px;height:28px;
+border-radius:8px;
+background:rgba(99,102,241,0.1);
+display:flex;align-items:center;justify-content:center;
+font-weight:700;
+font-size:0.78rem;
+color:var(--accent-light);
+flex-shrink:0;
+transition:var(--transition);
+}
+.option-btn:hover:not(.disabled){
+border-color:rgba(99,102,241,0.4);
+background:var(--surface-hover);
+transform:translateX(4px);
+}
+.option-btn.selected{
+border-color:var(--accent);
+background:rgba(99,102,241,0.08);
+}
+.option-btn.selected .opt-label{
+background:var(--accent);
+color:#fff;
+}
+.option-btn.correct{
+border-color:var(--green);
+background:var(--green-glow);
+}
+.option-btn.correct .opt-label{
+background:var(--green);
+color:#fff;
+}
+.option-btn.wrong{
+border-color:var(--red);
+background:var(--red-glow);
+}
+.option-btn.wrong .opt-label{
+background:var(--red);
+color:#fff;
+}
+.option-btn.disabled{
+cursor:default;
+opacity:0.7;
+}
+.option-btn.disabled:hover{transform:none}
+.option-btn.correct.disabled,.option-btn.wrong.disabled{opacity:1}
+.nav-row{
+display:flex;
+justify-content:flex-end;
+gap:12px;
+margin-top:8px;
+}
+.btn{
+padding:13px 28px;
+border-radius:var(--radius-sm);
+font-family:inherit;
+font-size:0.88rem;
+font-weight:700;
+cursor:pointer;
+transition:var(--transition);
+border:none;
+display:inline-flex;
+align-items:center;
+gap:8px;
+}
+.btn-primary{
+background:linear-gradient(135deg,var(--accent),#8b5cf6);
+color:#fff;
+box-shadow:0 4px 20px rgba(99,102,241,0.3);
+}
+.btn-primary:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 30px rgba(99,102,241,0.4);
+}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{
+background:var(--surface);
+color:var(--text-primary);
+border:1px solid var(--border);
+}
+.btn-secondary:hover{
+background:var(--surface-hover);
+border-color:rgba(255,255,255,0.1);
+}
+.btn:disabled{
+opacity:0.4;
+cursor:not-allowed;
+transform:none !important;
+}
+.results-screen{
+text-align:center;
+padding-top:40px;
+}
+.results-ring{
+width:180px;height:180px;
+margin:0 auto 30px;
+position:relative;
+}
+.results-ring svg{
+width:100%;height:100%;
+transform:rotate(-90deg);
+}
+.results-ring circle{
+fill:none;
+stroke-width:8;
+stroke-linecap:round;
+}
+.ring-bg{stroke:var(--surface)}
+.ring-fill{
+stroke:var(--accent);
+stroke-dasharray:502;
+stroke-dashoffset:502;
+transition:stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1);
+}
+.ring-fill.green{stroke:var(--green)}
+.ring-fill.yellow{stroke:var(--yellow)}
+.ring-fill.red{stroke:var(--red)}
+.results-ring .score-center{
+position:absolute;
+inset:0;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+}
+.score-big{
+font-size:2.8rem;
+font-weight:900;
+animation:countUp 0.8s ease;
+}
+.score-big.green{color:var(--green)}
+.score-big.yellow{color:var(--yellow)}
+.score-big.red{color:var(--red)}
+.score-label{
+font-size:0.75rem;
+color:var(--text-muted);
+text-transform:uppercase;
+letter-spacing:1px;
+font-weight:600;
+}
+.results-title{
+font-size:1.5rem;
+font-weight:800;
+margin-bottom:8px;
+}
+.results-subtitle{
+font-size:0.92rem;
+color:var(--text-secondary);
+margin-bottom:32px;
+}
+.results-stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+margin-bottom:32px;
+}
+.r-stat{
+background:var(--bg-card);
+border:1px solid var(--border);
+border-radius:var(--radius-sm);
+padding:16px;
+}
+.r-stat-val{
+font-size:1.4rem;
+font-weight:800;
+}
+.r-stat-val.green{color:var(--green)}
+.r-stat-val.red{color:var(--red)}
+.r-stat-val.blue{color:var(--accent-light)}
+.r-stat-lbl{
+font-size:0.68rem;
+color:var(--text-muted);
+text-transform:uppercase;
+letter-spacing:0.6px;
+margin-top:4px;
+font-weight:600;
+}
+.results-actions{
+display:flex;
+gap:12px;
+justify-content:center;
+flex-wrap:wrap;
+}
+.feedback-strip{
+margin-top:-8px;
+margin-bottom:16px;
+padding:10px 16px;
+border-radius:var(--radius-sm);
+font-size:0.82rem;
+font-weight:600;
+animation:fadeSlide 0.3s ease;
+}
+.feedback-strip.correct-fb{
+background:var(--green-glow);
+color:var(--green);
+border:1px solid rgba(34,197,94,0.2);
+}
+.feedback-strip.wrong-fb{
+background:var(--red-glow);
+color:var(--red);
+border:1px solid rgba(239,68,68,0.2);
+}
+.footer{
+margin-top:auto;
+padding-top:24px;
+text-align:center;
+font-size:0.72rem;
+color:var(--text-muted);
+}
+@media(max-width:600px){
+.app{padding:16px 14px}
+.stats-row,.results-stats{grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-card{padding:12px 8px}
+.stat-number{font-size:1.3rem}
+.question-card{padding:20px 16px}
+.question-text{font-size:0.95rem}
+.option-btn{padding:12px 14px;font-size:0.84rem}
+.logo-text h1{font-size:1.3rem}
+.results-ring{width:150px;height:150px}
+.score-big{font-size:2.2rem}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div id="homeScreen" class="screen active">
+<div class="logo">
+<div class="logo-icon">⚡</div>
+<div class="logo-text">
+<h1>IoT Quiz Master</h1>
+<p>NPTEL IIOT Assignments</p>
+</div>
+</div>
+<p class="hero-subtitle">
+Test your knowledge across <strong>3 years</strong> of NPTEL Introduction to Internet of Things assignments. Choose a mode and start quizzing!
+</p>
+<div class="stats-row">
+<div class="stat-card">
+<div id="totalQCount" class="stat-number">0</div>
+<div class="stat-label">Questions</div>
+</div>
+<div class="stat-card">
+<div class="stat-number">3</div>
+<div class="stat-label">Years</div>
+</div>
+<div class="stat-card">
+<div id="totalAssignments" class="stat-number">0</div>
+<div class="stat-label">Assignments</div>
+</div>
+</div>
+
+<div class="section-title">Choose Quiz Mode</div>
+<div class="mode-grid">
+<div class="mode-card" id="modeRandomAll" onclick="startRandomAll()">
+<div class="mode-icon purple">🔀</div>
+<div class="mode-info">
+<h3>Random Order (All)</h3>
+<p>All questions from every year, completely shuffled</p>
+</div>
+</div>
+<div class="mode-card" id="modeYearSeq" onclick="toggleYearSelector('seq')">
+<div class="mode-icon blue">📋</div>
+<div class="mode-info">
+<h3>Year-wise Sequential</h3>
+<p>Questions in original document order, grouped by year</p>
+</div>
+</div>
+<div id="yearSelectorSeq" class="year-selector"></div>
+<div class="mode-card" id="modeYearRand" onclick="toggleYearSelector('rand')">
+<div class="mode-icon teal">🎲</div>
+<div class="mode-info">
+<h3>Year-wise Random</h3>
+<p>Questions from a specific year, shuffled randomly</p>
+</div>
+</div>
+<div id="yearSelectorRand" class="year-selector"></div>
+</div>
+</div>
+
+<div id="quizScreen" class="screen">
+<div class="quiz-header">
+<div class="quiz-meta">
+<span id="yearBadge" class="year-badge"></span>
+<span id="progressText" class="progress-text"></span>
+</div>
+<div id="scoreDisplay" class="score-display">✓ <span id="liveScore">0</span></div>
+</div>
+<div class="progress-bar-container">
+<div id="progressBar" class="progress-bar" style="width:0%"></div>
+</div>
+<div class="question-card">
+<div id="questionText" class="question-text"></div>
+<div id="optionsList" class="options-list"></div>
+</div>
+<div id="feedbackStrip" class="feedback-strip" style="display:none"></div>
+<div class="nav-row">
+<button id="nextBtn" class="btn btn-primary" onclick="nextQuestion()" disabled>
+Next →
+</button>
+</div>
+</div>
+
+<div id="resultsScreen" class="screen results-screen">
+<div class="results-ring">
+<svg viewBox="0 0 180 180">
+<circle class="ring-bg" cx="90" cy="90" r="80"/>
+<circle id="ringFill" class="ring-fill" cx="90" cy="90" r="80"/>
+</svg>
+<div class="score-center">
+<div id="scoreBig" class="score-big">0%</div>
+<div class="score-label">Score</div>
+</div>
+</div>
+<h2 id="resultsTitle" class="results-title"></h2>
+<p id="resultsSubtitle" class="results-subtitle"></p>
+<div class="results-stats">
+<div class="r-stat">
+<div id="rCorrect" class="r-stat-val green">0</div>
+<div class="r-stat-lbl">Correct</div>
+</div>
+<div class="r-stat">
+<div id="rWrong" class="r-stat-val red">0</div>
+<div class="r-stat-lbl">Wrong</div>
+</div>
+<div class="r-stat">
+<div id="rTotal" class="r-stat-val blue">0</div>
+<div class="r-stat-lbl">Total</div>
+</div>
+</div>
+<div class="results-actions">
+<button class="btn btn-primary" onclick="restartQuiz()">🔄 Restart Quiz</button>
+<button class="btn btn-secondary" onclick="goHome()">🏠 Home</button>
+</div>
+</div>
+
+<div class="footer">Built for NPTEL IoT Exam Prep • 2024 · 2025 · 2026</div>
+</div>
+
+<script>
+const quizData = {
+"2024": [
+{q:"Which of the following is/are the characteristics of IoT?",o:["Efficient, scalable and associated architecture.","Unambiguous naming and addressing.","Abundance of sleeping nodes, mobile and non-IP device.","All of these"],a:3},
+{q:"A ___________ allows us to use our smartphones to lock and unlock our door remotely at our homes or our businesses.",o:["Smart Meter","ATM","Digital Lock","Web"],a:2},
+{q:"The function/functions of an IoT Gateway is/are to?",o:["Forward packets between LAN and WAN and on the IP layer","Connect IoT LAN to a WAN","Both (a) and (b)","None of these"],a:2},
+{q:"Multi-homing is the concept where a node can be connected to multiple networks for ___.",o:["Reduced Reliability","Improved Reliability","None of these","Both (a) and (b)"],a:1},
+{q:"A Passive Infrared Ray (PIR) sensor is used for ___?",o:["Humidity Detection","Tilt Detection","Obstacle Detection","Smoke Detection"],a:2},
+{q:"For which of the following, Vector Sensors are required to measure or sense them?",o:["Color, Pressure, Temperature","Orientation, Image","None of these","Both (a) and (b)"],a:1},
+{q:"The sensitivity of a sensor under real conditions may differ from the value specified. This is called ___?",o:["Maximal Error","Minimal Error","Median Error","Sensitivity Error"],a:3},
+{q:"A random deviation of the signal that varies in time is called ___.",o:["Noise","Sound","Bias","None of these"],a:0},
+{q:"A Relay Switch is an example of ___.",o:["A Sensor","An Actuator","A Transducer","None of These"],a:1},
+{q:"What is a Pneumatic Actuator?",o:["It is a type of actuator driven by compressed air or vacuum","It is a type of actuator driven by fluid","It is a type of actuator driven by solid","None of these"],a:0},
+{q:"Which type of actuators tend to be compact, lightweight, economical, and with high power density?",o:["Thermal or Magnetic Actuators","Hydraulic Actuators","Both (a) and (b)","None of these"],a:0},
+{q:"Polymer based actuators designed to handle fragile objects like fruit harvesting in agriculture or manipulating internal organs in biomedicine are called?",o:["Pneumatic Actuators","Soft Actuators","Software Actuators","Hardware Actuators"],a:1},
+{q:"Full form of SMP is ___?",o:["Soft Memory Polymer","Shape Memory Polymer","Software Memory Polymer","None of these"],a:1},
+{q:"Duty Cycling of the sensors is managed by which component of IoT?",o:["Application","Real-Time Kernel","Radios","Power Management Unit"],a:3},
+{q:"Which of the following are challenges of IoT?",o:["Security","Complexity Management","Modeling and Analysis","All of these"],a:3},
+{q:"Which of the following is based on the publish-subscribe model?",o:["MQTT","HTTP","HTTPS","All of these"],a:0},
+{q:"In MQTT, a topic to which a client is subscribed is updated in the form of messages and distributed by the ___?",o:["Publishers","Message Broker","Subscribers","All of these"],a:1},
+{q:"Which of the following is used when more than one level needs to be subscribed, such as the entire sub-tree, i.e., a multilevel wildcard?",o:["+","#","\\","None of these"],a:1},
+{q:"The CoAP protocol is designed for -",o:["Heavy Web Application","Publish-Subscribe Applications","Machine-to-Machine (M2M) applications","Both (a) and (b)"],a:2},
+{q:"Statement I – The messaging sub-layer of CoAP, is responsible for reliability and duplication of messages.\nStatement II – The request/response sub-layer is responsible for communication.\nWhich of the above statement/statements is/are correct?",o:["Only Statement I","Only Statement II","Both Statement I and II","Statement I Correct but Statement II Incorrect"],a:2},
+{q:"Which of the following is a messaging mode in CoAP?",o:["Append","Substitute","Attempt","Separate"],a:3},
+{q:"Which of the following provides for the discovery of services residing locally or across a network?",o:["Internet","SMQTT","XMPP","CoAP"],a:2},
+{q:"AMQP is a protocol of which layer?",o:["Transport Layer","Application Layer","Network Layer","Session Layer"],a:1},
+{q:"Which of the following is NOT a feature of the AMQP protocol?",o:["Closed Standard","Security","Reliability","Routing"],a:0},
+{q:"There are a total of ___ number of AMQP frame types defined.",o:["Seven","Eight","Nine","None of these"],a:2},
+{q:"The function/functions of the Queue component of the AMQP protocol is/are -",o:["Receive messages and route them to queues","Separate queues for separate business process","Consumer receive messages from queues","Both (b) and (c)"],a:3},
+{q:"Which of the following statements is/are false?\nStatement I: IEEE 802.15.4 is a well-known standard for low data-rate WPAN.\nStatement II: IEEE 802.15.4 standard operates in the ISM band.",o:["Statement II","Statement I","Both Statement I and II","None of these"],a:3},
+{q:"The IEEE 802.15.4 establishes functionalities in which layers?",o:["Application and Session Layers","Transport and Data Link Layers","Network and Session Layers","Physical and Data Link Layers"],a:3},
+{q:"Which is not a purpose of the ZigBee Device Object (ZDO)?",o:["Device Management","Interfacing and Control Services","Security","Policies"],a:1},
+{q:"State whether the following statement is True or False.\nStatement: Similar to traditional barcodes and QR codes, RFID tag data cannot be read outside the line-of-sight.",o:["False","True"],a:0},
+{q:"Choose the correct option based on the following two statements on the HART Physical Layer.\nStatement-I: It is derived from the IEEE 802.15.4 protocol.\nStatement-II: It operates only in the 2.4 GHz ISM band.",o:["Statement-I True and Statement-II False","Statement-I False and Statement-II True","Both Statements I and II are False","Both Statements I and II are True"],a:3},
+{q:"Which of the following characteristic of HART Data Link Layer helps to increase reliability and security?",o:["Channel Hopping and Channel Blacklisting","Channel Crunching and Jamming","Scattering","All of these"],a:0},
+{q:"State True or False\nStatement: Channel blacklisting in HART identifies channels consistently affected by interference and removes them from use.",o:["True","False"],a:0},
+{q:"At the MAC layer –\nStatement-I: WirelessHART utilizes TDMA.\nStatement-II: ZigBee applies CSMA/CD.",o:["Statement-I True and Statement-II False","Statement-I False and Statement-II True","Both Statements I and II are False","Both Statements I and II are True"],a:3},
+{q:"NFC works on the principle of",o:["Pressure","Magnetic Induction","Both (a) and (b)","None of these"],a:1},
+{q:"Bluetooth technology is based on Ad-hoc technology also known as?",o:["Ad-hoc Piconets","Ad-hoc Micronets","Ad-hoc Nanonets","None of these"],a:0},
+{q:"Class 2 Bluetooth radios have a range of about?",o:["1 m","2 m - 5 m","10 m","None of these"],a:2},
+{q:"Which of the following is NOT a phase in Bluetooth connection establishment?",o:["Inquiry","Booking","Paging","Connection"],a:1},
+{q:"Zwave can support ___ number of nodes in a network?",o:["232","233","234","235"],a:0},
+{q:"Topologies allowed in ISA 100.11A are?",o:["Ring Only","Mesh and Hybrid","Mesh and Ring","Mesh and Star/Tree"],a:3},
+{q:"An example of an Operating System (OS) that a sensor node can have is?",o:["MicronOS","TinyOS","Both (a) and (b)","None of these"],a:1},
+{q:"Which of the following is NOT a constraint on sensor nodes?",o:["Must consume extremely low power","Be non-autonomous","Be adaptive to environment","None of these"],a:1},
+{q:"Nodes in WSNs that exhibit features of failed nodes but they can also send false routing messages are called?",o:["Normal Nodes","Badly Failed Nodes","Failed Nodes","Selfish Nodes"],a:1},
+{q:"Which of the following are the two popular schemes to re-establish the connectivity between dumb nodes with others?",o:["CoARD and CoRD","CoRAD and CoARD","CoRD and CoRAD","None of these"],a:2},
+{q:"Full form of WBAN is?",o:["Wireless Body Area Network","Wirelessed Body Area Network","Wireless Bodily Area Network","None of these"],a:0},
+{q:"When an intruder enters into the agricultural field, a ___ sensor can be used to detect the object and a ___ sensor can be used to sense the distance.",o:["PIR, Ultrasonic","Ultrasonic, PIR","Humidity, PIR","None of these"],a:0},
+{q:"___ is defined as, all the nodes are connected in the network, so that sensed data can reach to sink node?",o:["Coverage","Connectivity","Both (a) and (b)","None of these"],a:1},
+{q:"The objective of coverage in WSN is.",o:["To use a minimum number of sensors and maximize the network lifetime","To use a maximum number of sensors and maximize the network lifetime","To use a minimum number of sensors and minimize the network lifetime","To use a maximum number of sensors and minimize the network lifetime"],a:0},
+{q:"State True or False\nStatement-I: If transmission range ≤ 2× sensing range, coverage implies connectivity.",o:["Statement-I is True","Statement-I is False"],a:1},
+{q:"A mobile entity that collects the data from sensor nodes and delivers the collected data are called?",o:["Data Molecule","Static Node","Data Mules","None of these"],a:2},
+{q:"Human-centric Sensing is possible because of?",o:["Smartphone and PDAs","Miniaturization and Proliferation of devices","Both (a) and (b)","None of these"],a:2},
+{q:"Which of the following are the roles played by humans in Human-centric Sensing?",o:["Sensing Targets","Sensor Operators","Data Source","All of these"],a:3},
+{q:"Which of the following is/are NOT goal of Participatory Sensing?",o:["To only collect data","Not just collect data, but allow common people to access data and share knowledge","To only access data","Both (a) and (c)"],a:3},
+{q:"The two popular network topologies in UAV networks are",o:["Ring","Mesh and Star","Bus","All of these"],a:1},
+{q:"Which of the following is NOT an issue in UAV networks?",o:["Slow change in network topology","Malfunctioning of UAVs","Intermittent link nature","Relative position of UAV may change"],a:0},
+{q:"The scalability in single UAV system as compared to multi-UAV system is?",o:["Limited","High","Very High","None of these"],a:0},
+{q:"Typical types of mesh networks in UAV networks are",o:["Solid Mesh and Hierarchical Mesh","Plane Mesh and Solid Mesh","Flat Mesh and Hierarchical Mesh","None of these"],a:2},
+{q:"State True or False\nStatement-I: SCADA is designed for isolated systems using proprietary solutions, whereas M2M is designed for cross-platform integration.",o:["False","True"],a:1},
+{q:"Which of the following is NOT a feature of M2M?",o:["Large number of nodes or devices","High cost","Energy efficient","Small traffic per machine/device"],a:1},
+{q:"Which of the following is NOT an M2M node type?",o:["Low End Node","High End Node","Out End Node","None of these"],a:2},
+{q:"Suppose that an IoT sensor node A works on wireless WiFi and senses pressure as integer, and another IoT node B operates on IEEE 802.15.4 Zigbee and senses humidity as floating point. Which describes the issues?",o:["Heterogeneity","Interoperability","Both heterogeneity and interoperability","Neither heterogeneity and interoperability"],a:2},
+{q:"RESTful web services are utilized for ___.",o:["Syntactic interoperability for device interaction","Semantic interoperability for device interaction","Both (a) and (b)","None of the above"],a:0},
+{q:"Which UMB interoperability component is responsible for converting physical devices into virtually abstracted ones?",o:["UMB Adaptor","UMB Core","UMB Hypervisor","UMB Abstractor"],a:0},
+{q:"User interoperability is the interoperability problem between a user and ___.",o:["Another user","Device","Both user and device","None of these"],a:1},
+{q:"Which of the following is an open, global, multi-sector standard for efficient classification of products and services?",o:["eCl@ss","UNSPSC","EPC","Both UNSPSC and EPC"],a:1},
+{q:"What does the routing component in UMB-C use for routing the metadata messages?",o:["Flow Table","Routing Table","Middleware Routing Table","Middleware Flow Table"],a:2},
+{q:"Which among the following are components of an Arduino UNO Board?",o:["LED Power Indicator","Digital I/O Pins","Analog IN Pins","All of these"],a:3},
+{q:"The tool used to select a particular COM port for connecting Arduino to a serial connector is called a sketch.",o:["True","False"],a:1},
+{q:"Which kind of conflict occurs when different processing logic are applied to same IoT networked devices or applications?",o:["Semantic conflict","Syntactic conflict","System conflict","Device conflict"],a:0},
+{q:"Which of the following is TRUE for the sketch command: delay(3000);",o:["Provides a delay of 3000 seconds","Provides a delay of 3 seconds","Provides a delay of 3000 nano seconds","Provides a delay of 3000 simulation time"],a:1},
+{q:"How many types of loops will you find in Arduino Programming?",o:["1","2","3","4"],a:2},
+{q:"How many digital I/O pins are there in Arduino Uno?",o:["14","54","11","16"],a:0},
+{q:"Servo motors that you connect to Arduino, are an example of",o:["Sensors","Actuators","Gateways","Routers"],a:1},
+{q:"Which of the following functions exist by default in Arduino IDE?",o:["main()","loop() and main()","setup() and loop()","setup() and main()"],a:2},
+{q:"Choose the right option for if/conditional operator.",o:["Val = (condition)?(Statement 1):(Statement 2)","Val = (condition)?(Statement 2):(Statement 1)","Val = (condition):(Statement 1)?(Statement 2)","Val = (condition):(Statement 2)?(Statement 1)"],a:0},
+{q:"Python's installation comes with an integrated development environment for programming.",o:["True","False"],a:0},
+{q:"Python IDE is available for installation into PC with ___.",o:["Windows","Linux","Mac","All of these"],a:3},
+{q:"How many data types are available in Python?",o:["1","2","5","None of these"],a:2},
+{q:'What is the output of: ls= {1: "abc", "key": "2", "year": 2023}; print(ls["key"])',o:["abc","2","2023",'"abc"'],a:1},
+{q:"The variable that is declared inside the function in Python is called a Global variable.",o:["True","False"],a:1},
+{q:"Which of the following is used to read a text file in Python?",o:["file = open('data.txt','r')","file = open_text('data.txt','r')","file = read_text('data.txt','r')","file = read('data.txt','r')"],a:0},
+{q:"Which of the following libraries in Python is used for processing images?",o:["Pillow","Numpy","Panda","None of these"],a:0},
+{q:"In python, images cannot be converted to greyscale.",o:["True","False"],a:1},
+{q:"Which of the following is an unordered data type in Python?",o:["List","Dictionary","Both List and Dictionary","Tuple"],a:1},
+{q:"Sensors can be analog or digital. Is the statement true?",o:["Yes","No"],a:0},
+{q:"Is relay a type of mechanical switch?",o:["No","Yes"],a:1},
+{q:"Which of the following converts energy to motion?",o:["Actuator","Raspberry Pi","Sensor","None of these"],a:0},
+{q:"Python does not follow strict indentation.",o:["True","False"],a:1},
+{q:"Functions cannot be reassigned to the variables in Python.",o:["True","False"],a:1},
+{q:"The switches in a non-SDN environment do not have a global view of the network.",o:["True","False"],a:0},
+{q:"Which of the following is not a function of the Application Plane in SDN architecture?",o:["Business Logic implementation","Security","Traffic Engineering","Forwarding"],a:3},
+{q:"In Socket programming, the parameter AF_INET stands for ___.",o:["Unix protocols","Internet Protocol (IP)","File sharing","Time slicing"],a:1},
+{q:"During remote server access by a Raspberry Pi acting as a client, the client needs?",o:["Only IP address of server","Only port number","Both server IP address and port number","Client's IP address"],a:2},
+{q:"Controllers in SDN receive requests from the ___.",o:["Repeaters","Gateways","Switches","Routers"],a:2},
+{q:"During remote server access using socket programming, what is the utility of <socket_name>.listen()?",o:["To create a new socket","To bind the socket to connection","To wait for clients to connect","To close the connection"],a:2},
+{q:"With respect to client-server model of socket programming, in which does the function <socket_name>.bind() reside?",o:["Client","Server","Both client and server","None of client and server"],a:1},
+{q:"Which among the following are valid data processing activities?",o:["Data Splitting","Data filtering","Data plotting","All of the given"],a:3},
+{q:"Which among the following is the correct direction for PACKET_IN type messages in SDN?",o:["From controller to switch","From switch to controller","Between two switches","Between two controllers"],a:1},
+{q:"Suppose a particular flow-rule has a soft time-out of 5s and a hard time-out of 3s. Is this association correct?",o:["Yes","No"],a:1},
+{q:"In SDN, Backup Controllers are required for?",o:["To act as backup of the main controller all the time","To act as backup when the main controller fails","To replace the main controller altogether","None of the stated"],a:1},
+{q:"Which of the following is true regarding Traditional Network vs Software Defined Network?",o:["Traditional: Routing Table, SDN: Routing Table","Traditional: Flow Table, SDN: Routing Table","Traditional: Routing Table, SDN: Flow Table","Traditional: Flow Table, SDN: Flow Table"],a:2},
+{q:"What are the benefits of using SDN over IoT?",o:["Management of device heterogeneity","Management of end-device mobility and dynamic flow rules","Software control of end-devices","All of the given"],a:3},
+{q:"Sensor OpenFlow, Soft-WSN and SDN-WISE are examples of ___.",o:["Traditional routing protocols","Various SDN protocols for wired LANs","Various implementations of Software Defined IoT","Traditional IoT protocol examples"],a:2},
+{q:"Consider the Python script: dat = 'Apple,Guava#Banana'; var = dat.split('#'); print(var)",o:["['Apple','Guava','Banana']","['Apple','Guava']","['Guava','Banana']","['Apple,Guava','Banana']"],a:3},
+{q:"Which among the following are core challenges of traditional mobile networks?",o:["Scalability","Flexibility","Manageability","All of the given"],a:3},
+{q:"Network virtualization enables ___ of physical resources.",o:["Movement","Abstraction","Removal","Creation"],a:1},
+{q:"In comparison to SDN, traditional networks are cost expensive with respect to?",o:["Both capex and opex","Capex but not opex","Opex but not capex","Neither capex nor opex"],a:0},
+{q:"General OpenFlow supports both wireless and wired connections.",o:["True","False"],a:1},
+{q:"With respect to SD-DCN, ___ can use wild cards and ___ uses exact match rules.",o:["Mice flows, Elephant flows","Elephant flows, Mice flows","Mice flows, traditional flows","Traditional flows, Elephant flows"],a:0},
+{q:"In cloud computing model, which are characteristics of computing resources?",o:["On-demand","Shared","Configurable","All of these"],a:3},
+{q:"IaaS, PaaS and SaaS are examples of what type of cloud models?",o:["Cloud deployment model","Cloud service model","Cloud access model","Cloud virtualization model"],a:1},
+{q:"An organization wants to push majority of data to public cloud but certain private data to on-premise cloud servers. Which deployment model should be used?",o:["Private Cloud","Public Cloud","Hybrid Cloud","Any of these"],a:2},
+{q:"Which type of client requires constant communication/connection with the cloud server?",o:["Thin client","Thick client","Both thin and thick clients","None of these"],a:0},
+{q:"Typically, cloud computing has ___ components?",o:["4","5","6","7"],a:2},
+{q:"What does 'CIA' in cloud data security stand for?",o:["Confidentiality, Integrity, Availability","Confidentiality, Inheritance, Automation","Congestion, Integrity, Authentication","Criticality, Integrity, Accountability"],a:0},
+{q:"In SaaS model of cloud computing, which acts as the thin-client?",o:["Cloud gateway","Web monitor","Web browser","Local firewall"],a:2},
+{q:"Data in ___ and Data at ___ are two important aspects of data security.",o:["past, present","time, place","transit, rest","None of these"],a:2},
+{q:"Which among the following is a metric for SLA in Cloud Computing?",o:["Availability","Portability","Response Time","All of these"],a:3},
+{q:"Which cloud computing model does AWS EC2 belong to?",o:["IaaS","PaaS","SaaS","None of these"],a:0},
+{q:"OpenStack is a free open source software for cloud framework simulation.",o:["True","False"],a:0},
+{q:"Which among the following is NOT a component of OpenStack?",o:["Horizon","Heat","Plasma","Neutron"],a:2},
+{q:"You cannot ping your OpenStack instance from an outside network unless you connect it through a ___.",o:["Router","Firewall","Repeater","Load balancer"],a:0},
+{q:"Virtualized resources within the OpenStack simulator are also known as",o:["Instances","Files","Hypervisors","Sketches"],a:0},
+{q:"The SCSP in sensor clouds is responsible for caching the data in the databases.",o:["True","False"],a:0},
+{q:"Select the correct option for the sensor cloud user organization view architecture.",o:["User credentials","Template display","Template view","User view"],a:2},
+{q:"Which is the principal feature of sensor clouds, with respect to sensor nodes?",o:["Sensor monitoring","Sensor instantiation","Sensor virtualization","Sensor collection"],a:2},
+{q:"Caching in sensor cloud provides no benefit over regions with slow environmental monitoring rate.",o:["True","False"],a:1},
+{q:"How many different types of caching mechanism are there in sensor cloud?",o:["1","4","2","3"],a:2},
+{q:"Virtual sensors within a sensor cloud have communication interfaces with ___.",o:["Only the physical sensors below them","Only the end-user applications above them","Both physical sensors below and applications above","Neither"],a:2},
+{q:"Data from an IoT device takes 10s one-way transfer to cloud, processing at cloud is 'x' seconds, total round-trip is 25s. What is x?",o:["10s","5s","15s","20s"],a:1},
+{q:"In IoT, temporal sensitivity of data plays an important role.",o:["True","False"],a:0},
+{q:"Extremely time sensitive data in IoT should be processed and analyzed ___.",o:["Farthest away from source","Closest to the source","Distance doesn't matter","None of these"],a:1},
+{q:"Which among the following is a view of a Fog Computing Architecture?",o:["Node View","System View","Software View","All of these"],a:3},
+{q:"Which among the following is true?",o:["Fog computing acts as a complement to cloud computing","Fog computing is a replacement for cloud computing","Fog computing and cloud computing are the same","Fog computing is more powerful than cloud computing"],a:0},
+{q:"A smart city ___.",o:["Is an urban system","Uses ICT","Makes infrastructure more reliable","All of these"],a:3},
+{q:"Collective data is more intelligent than the single sources.",o:["True","False"],a:0},
+{q:"Which of the following is one of the challenges of Data fusion?",o:["Imperfection","Conflicts","Ambiguity","All of these"],a:3},
+{q:"Which of the following are challenges for IoT in smart cities?",o:["Security and Reliability","Small scale","Homogeneity","None of these"],a:0},
+{q:"___ combines information from multiple sensors.",o:["Data storage","Data cleaning","Data fusion","None of these"],a:2},
+{q:"Which of the following are the functional layers in smart parking?",o:["Information collection","System Deployment","Service Dissemination","All of these"],a:3},
+{q:"Which statements are true about components in a smart home?\nI: Sensor networks and communication network infrastructure\nII: Intelligent control and management\nIII: Manual instead of automatic access of devices",o:["Statements I and II","Statements I and III","Statements II and III","Statements I, II and III"],a:0},
+{q:"Which of the following are included in the Service Dissemination in smart parking?",o:["Statement I and II","Statement II and III","Statement I and III","Statement I, II and III"],a:3},
+{q:"___ is a network contained within a home.",o:["Local area network","Home area network","Personal area network","Metropolitan area network"],a:1},
+{q:"In Vehicle-to-Human interaction, the human communicating with the vehicle ___.",o:["Is present in another vehicle","Is present in the same vehicle","Is present outside the vehicle on the roadside","All of these"],a:2},
+{q:"Wired HAN provides easy integration with pre-existing house infrastructure.",o:["True","False"],a:0},
+{q:"Which statement(s) is/are true about Konnex?",o:["Utilizes only short ranges in home","Can be used before configuration","Does not have standards for building networks","None of these"],a:3},
+{q:"Which is the reason for failures of TCP/IP in V2X?",o:["TCP/IP handles information exchange between multiple pair of entities","The increase in wireless devices restricts the mobility","TCP/IP can identify the addresses of the endpoints","Information exchange does not depend on location"],a:1},
+{q:"CCN is derived from ICN architecture.",o:["True","False"],a:0},
+{q:"What are the disadvantages of V2X communication?",o:["Increased traffic safety","Tracking of movement","Efficient use of fuel","None of these"],a:1},
+{q:"Which of the following is not done in traditional electrical grids?",o:["Manual energy monitoring","Unidirectional energy distribution","Unidirectional communication","Distributed power plants"],a:3},
+{q:"Smart Grid is also named as—",o:["Electronet","Energy service","Grid with a brain","Smart internet"],a:0},
+{q:"Which of the following is not a property of smart grids?",o:["Bidirectional flow of energy","Two-way communication","Unreliable and insecure electricity","Control Capabilities"],a:2},
+{q:"Which is the benefit of using Smart Grids for stakeholders?",o:["Reduces inefficiencies in energy delivery","Different pricing options","Lower Energy bills","All of these"],a:0},
+{q:"___ samples voltage and current with a fixed sample rate at the installed location.",o:["PEVs","DAUs","PMUs","None of these"],a:2},
+{q:"Which of the following is a cloud application of smart grid?",o:["Information management","Energy management","Security","All of these"],a:3},
+{q:"Which statements are true about MDMSs?\nI: Decide the price per unit energy\nII: Handled by the energy service providers\nIII: Aggregate the energy consumption of certain geographical area",o:["Statements I and II","Statements I and III","Statements II and III","Statements I, II and III"],a:0},
+{q:"Which are included in the Smart Grid security issues of integrity?\nI: System Damage\nII: Data injection attacks\nIII: Time synchronization attacks",o:["Statement I and II","Statement II and III","Statement I and III","Statement I, II and III"],a:3},
+{q:"___ is a primary challenge in IIoT.",o:["Worker health and safety","Optimized operations","Regulatory compliance","Integrating existing infrastructure into new IIoT infrastructure"],a:3},
+{q:"Rt Tech particularizes in software which ___.",o:["Improves industrial facilities' efficiency","Improves productivity","Automates managing of energy consumption","All of these"],a:3},
+{q:"Lack of vision and leadership is not a hindrance in the path of success of IIoT.",o:["True","False"],a:1},
+{q:"Which of the following is not a vulnerability of Smart Grid?",o:["Integrity","Physical threats","Dynamic system attacks","None of these"],a:3},
+{q:"Which of the following is a characteristic of Big Data?",o:["Veracity","Variability","Velocity","All of these"],a:3},
+{q:"Variety refers to the category to which the data belongs.",o:["True","False"],a:0},
+{q:"What is the Flow of data?",o:["Acquisition>Generation>Storage>Analysis","Generation>Storage>Analysis>Acquisition","Generation>Acquisition>Storage>Analysis","None of these"],a:2},
+{q:"Quantitative analysis does not involve descriptive statistics such as mean.",o:["True","False"],a:1},
+{q:"To perform an ANOVA, we must have a ___ response variable and at least one ___ factor.",o:["Discrete, categorical","Continuous, quantitative","Discrete, quantitative","Continuous, categorical"],a:3},
+{q:"Select the statement(s) that denote the example of dispersion measure.\nI: Range, Variable and Standard deviation\nII: Range and average absolute deviation\nIII: Variance, Standard deviation and average absolute deviation",o:["Statement I","Statement II","Statements I, II and III","None of these"],a:2},
+{q:"The different components of AgriSens includes –",o:["Sensor and actuator unit","Wireless communication unit","Power management unit","All of these"],a:3},
+{q:"The two most relevant sensors directly used in agriculture are ___.",o:["Soil moisture and proximity sensor","Soil moisture and water level sensor","ECG sensor and water level sensor","All of these"],a:1},
+{q:"The sensor node of AgriSens senses the average soil moisture in ___.",o:["Vegetative phase","Reproductive phase","Maturity phase","All of these"],a:3},
+{q:"Select the correct order of the component layers in IoT healthcare.",o:["Sensing layer, cloud platform layer, aggregated layer, processing layer","Sensing layer, aggregated layer, processing layer, cloud platform layer","Aggregated layer, sensing layer, processing layer, cloud platform layer","Sensing layer, processing layer, aggregated layer, cloud platform layer"],a:1},
+{q:"Which communication protocol is used in AmbuSens?",o:["IEEE 802.15.4","6LoWPAN","IEEE 802.15.1","IEEE 802.15.2"],a:2},
+{q:"Wireless IoT driven solutions for remote healthcare brings healthcare to patients than bringing patients to healthcare.",o:["True","False"],a:0},
+{q:"Physical activity tracking is a necessary component for ___.",o:["Activity monitoring","Vehicle monitoring","Agriculture monitoring","All of these"],a:0},
+{q:"Which handheld devices are used for activity monitoring?",o:["EEG and GPS","Accelerometer and EEG","Accelerometer and GPS","All of these"],a:2},
+{q:"Which is the primary disadvantage of using camera-based activity tracking?",o:["Accurate","Process intensive","Expensive","None of these"],a:1},
+{q:"By performing continuous monitoring, it is not possible to observe behavior or identify repetitive patterns.",o:["True","False"],a:1},
+{q:"Which are the inbuilt sensors in high end smartphones?",o:["ECG and EEG","Accelerometer, proximity sensor, and EEG","Accelerometer, Compass and Gyroscope","Pressure sensor and NPK sensor"],a:2},
+{q:"Processing handheld activity device data with AI can be used for ___.",o:["Fall detection","Heart rate detection","Vehicle detection","All of these"],a:0}
+],
+"2025": [
+{q:"IoT stands for ___.",o:["Internet of Tasks","Internet of Tuples","Internet of Things","None of these"],a:2},
+{q:"Which technologies have unified and resulted in the evolution of IoT?",o:["High-power embedded systems","Super Computing","Engine Technology","None of these"],a:3},
+{q:"Which of the following are the enablers of IoT?",o:["RFID","Nanotechnology","Sensors","All of these"],a:3},
+{q:"Which of the following is NOT a function of an IoT LAN?",o:["Long range communication, global","World wide connections","Both (a) and (b)","Neither (a) Nor (b)"],a:2},
+{q:"The integration of existing devices, smart devices, and constrained nodes in a singular framework is one of the reasons for the address crunch in IoT.",o:["True","False"],a:0},
+{q:"In Multi-homing, a node/network is connected to a single network for improved reliability.",o:["True","False"],a:1},
+{q:"Which of the following is/are the approach(es) for multi-homing?",o:["Proxy-based approach","Gateway-based approach","Both (a) and (b)","None of these"],a:2},
+{q:"IPv6 uses ___ notation for its representation.",o:["Hexadecimal","Binary","Decimal","None of these"],a:0},
+{q:"The parameters sensed by a sensor may be sent to the cloud for further processing.",o:["False","True"],a:1},
+{q:"The IPv6 notation uses ___ number of bits to represent an address.",o:["64","128","Both (a) and (b)","Neither (a) nor (b)"],a:1},
+{q:"A sensor is -",o:["Only sensitive to the measured property","Insensitive to any other property","Both (a) and (b)","None of these"],a:2},
+{q:"We classify sensors based on -",o:["Output","Data type","Both (a) and (b)","None of these"],a:3},
+{q:"Based on the output, sensors are classified as ___.",o:["Analog","Digital","Both (a) and (b)","Neither (a) nor (b)"],a:2},
+{q:"Soft actuators are -",o:["Polymer-based","Mechanical","Electromechanical","None of these"],a:0},
+{q:"Based on functionality, MQTT is a ___ protocol.",o:["Transport","Data","Semantic","None of these"],a:1},
+{q:"MQTT is designed for -",o:["Remote connections","Limited bandwidth","Both (a) and (b)","Neither (a) nor (b)"],a:2},
+{q:"In MQTT, the Subscribers are Lightweight Sensors.",o:["True","False"],a:1},
+{q:"Which of the following is an MQTT component?",o:["Middleman","Mules","Both (a) and (b)","None of these"],a:3},
+{q:"A topic in MQTT can only be numbers.",o:["False","True"],a:0},
+{q:"There are only two methods specified by the MQTT protocol.",o:["False","True"],a:0},
+{q:"The Publish/Subscribe architecture in MQTT is ___ driven.",o:["Event","Pulse","Sound","None of these"],a:0},
+{q:"The topic is the routing information for the broker.",o:["True","False"],a:0},
+{q:"CoAP is ___ and ___.",o:["Based on HTTP","Is designed for M2M applications","None of these","Both (a) and (b)"],a:3},
+{q:"In CoAP, client-server interaction is asynchronous over a datagram transport protocol such as ___.",o:["UDP","TCP","IP","XMP"],a:0},
+{q:"What is the full form of AMQP?",o:["Advanced Message Querying Protocol","Advanced Message Quality Protocol","Advanced Message Queuing Protocol","None of these"],a:2},
+{q:"AMQP has ___ number of frame types.",o:["6","3","5","9"],a:3},
+{q:"The OSI model has 7 layers.",o:["True","False"],a:0},
+{q:"The 'Destination Address' in the IPv4 packet represents which of the following?",o:["The source node address","The intermediate hop in the network","Both (a) and (b)","Neither (a) nor (b)"],a:3},
+{q:"WirelessHART is the latest release of Highway Addressable Remote Transducer protocol.",o:["True","False"],a:0},
+{q:"WirelessHART physical layer is derived from 802.15.2 protocol.",o:["False","True"],a:0},
+{q:"WirelessHART operates only in ___ GHz ISM band.",o:["3.7","4.8","4.8","2.4"],a:3},
+{q:"Bluetooth technology is based on ___.",o:["HART","ZigBee","All of these","None of these"],a:3},
+{q:"Zigbee commonly uses ___ data rate.",o:["260 bps","260 kbps","260 Mbps","None of these"],a:3},
+{q:"In 'AID', a set of sensor nodes are deployed over an agricultural field.",o:["True","False"],a:0},
+{q:"Ultrasonic sensor senses the distance at which an object is located.",o:["True","False"],a:0},
+{q:"In case of static sensors, where to deploy/activate sensors in WSN is a coverage problem.",o:["True","False"],a:0},
+{q:"Objective of coverage in WSN is to use maximum number of sensors and minimize network lifetime.",o:["True","False"],a:1},
+{q:"'A crossing is covered if it is in the interior of at least one node's coverage disk.'",o:["True","False"],a:0},
+{q:"Which is/are correct for stationary wireless sensor networks?",o:["Topology cannot be changed automatically","Node failure may result in partition of networks","Both (a) and (b)","None of these"],a:2},
+{q:"Most problems in static WSN can be classified as -",o:["No coverage","More coverage","Both (a) and (b)","None of these"],a:3},
+{q:"Which is/are correct with respect to UAV networks?",o:["Multi-tasking","Large coverage area","Both (a) and (b)","None of these"],a:2},
+{q:"UAV networks are scalable.",o:["True","False"],a:0},
+{q:"In Mobile WSN, the Data Mules",o:["Collect the data from sensor nodes","Go to the sink and deliver the collected data","Both (a) and (b)","Neither (a) nor (b)"],a:2},
+{q:"The full form of AUV is -",o:["Antenna Used Vehicle","Autonomous Underwater Vehicle","Both (a) and (b)","Neither (a) nor (b)"],a:1},
+{q:"This paradigm of sensing where humans carry devices and sensors record readings is known as –",o:["Machine Centric Sensing","Device Centric Sensing","Human Centric Sensing","None of these"],a:2},
+{q:"Energy of Devices and Participant selection are not two major problems in Human Centric Sensing.",o:["True","False"],a:1},
+{q:"Which network topology is used in UAV networks?",o:["Bus","Star","Both (a) and (b)","Neither (a) nor (b)"],a:1},
+{q:"The M2M Application Platform provides integrated services based on device collected data-sets.",o:["True","False"],a:0},
+{q:"Which of the following is/are current challenges in IoT?",o:["Large scale of co-operation","Global heterogeneity","Both (a) and (b)","Neither (a) nor (b)"],a:2},
+{q:"Interoperability is not a characteristic of a product or system.",o:["True","False"],a:1},
+{q:"Interoperability is required because",o:["There are different programming languages","There are different communication protocols","Both (a) and (b)","Neither (a) nor (b)"],a:2},
+{q:"Use of different programming languages is an example of heterogeneity in IoT. This brings in the need for interoperability.",o:["False","True"],a:1},
+{q:"The interoperability between devices and device users in terms of message formats is called Systematic Interoperability.",o:["True","False"],a:1},
+{q:"What is the full form of UMB in IoT interoperability?",o:["Universal Meta Bridge","Universal Main Bridge","Universal Main Bracket","None of these"],a:3},
+{q:"Arduino is an open-source electronic programmable board.",o:["True","False"],a:0},
+{q:"Additional electronic circuits are essential to load a program into the Arduino controller board.",o:["True","False"],a:1},
+{q:"Arduino UNO has ___ number of Digital I/O pins.",o:["8","13","14","None of these"],a:2},
+{q:"How many types of loops will you find in Arduino Programming?",o:["1","2","3","4"],a:2},
+{q:"Choose the right option for if/conditional operator.",o:["Val = (condition)?(Statement 1):(Statement 2)","Val = (condition)?(Statement 2):(Statement 1)","Val = (condition):(Statement 1)?(Statement 2)","Val = (condition):(Statement 2)?(Statement 1)"],a:0},
+{q:"What is the purpose of calling dht.begin(); in the setup() function?",o:["To initialize the Serial Monitor","To start communication with the DHT sensor","To set temperature and humidity values to zero","To define the data pin for the sensor"],a:1},
+{q:"What function is used to read the humidity value from the DHT sensor?",o:["dht.getHumidity();","dht.readTemp();","dht.readHumidity();","dht.getTemperature();"],a:2},
+{q:"What function is used to set the servo motor to a specific angle?",o:["ServoDemo.move()","ServoDemo.rotate()","ServoDemo.write()","ServoDemo.setAngle()"],a:2},
+{q:"Python is popular for embedded application development as it is a very lightweight programming language.",o:["True","False"],a:0},
+{q:"Adafruit provides a library to work with DHT22 Sensor.",o:["True","False"],a:0},
+{q:"Consider the code: x=[4,5,6]; y=[str(x[0]+1), str(len(x)*2)+'&Code']; z=y[1].split('&'); print(z[1])",o:["5","12","Code","&Code"],a:2},
+{q:"To indicate different blocks of code, Python follows rigid indentation.",o:["True","False"],a:0},
+{q:"What is the output of: >>> print \"Hi, Welcome to python!\"",o:["Hi, Welcome to python!","\"Hi, Welcome to python!\"","Hi, Welcome to python","None of these"],a:0},
+{q:"During remote server access by a Raspberry Pi as a client, the client needs?",o:["Only IP address of server","Only port number","Both server IP address and port number","Client's IP address"],a:2},
+{q:"The command to install the PIL library (sudo pip install pillow) is correct.",o:["Correct","Incorrect"],a:0},
+{q:"What is the purpose of the 'w' mode in the open() function in Python?",o:["To read a file","To write data to a file, overwriting existing content","To append data to a file","To open a file in read and write mode"],a:1},
+{q:"Can we configure Raspberry Pi as a File Server?",o:["Yes","No"],a:0},
+{q:"Which command is used to configure the Raspberry Pi for the camera module?",o:["sudo camera-config","sudo raspi-config","sudo enable-camera","sudo pi-setup"],a:1},
+{q:"What is the final step after enabling the camera in the Raspberry Pi configuration?",o:["Restart the camera service","Run a camera test command","Reboot the Raspberry Pi","Reinstall the Raspberry Pi OS"],a:2},
+{q:"Which command exits the nano editor?",o:["Ctrl + X","Ctrl + O","Ctrl + K","None of these"],a:0},
+{q:"In a temperature-controlled fan system using a relay, when should the fan turn on?",o:["When the relay is manually triggered","When the temperature is lower than threshold","When the temperature exceeds a threshold","When the battery voltage drops"],a:2},
+{q:"What does the command: raspistillcapture -o image.jpg do?",o:["Captures video feed","Captures still image","Both (a) and (b)","None of these"],a:3},
+{q:"In Python socket programming, SOCK_STREAM refers to a type of",o:["SocketFamily","SocketType","SocketName","SocketProtocol"],a:1},
+{q:"If you want to change the Y-axis label when plotting with matplotlib (imported as plt), which function do you use?",o:["plt.show()","plt.plot()","plt.ylabel()","plt.yaxis()"],a:2},
+{q:"In Socket programming, the parameter AF_INET stands for ___.",o:["Unix protocols","Internet Protocol (IP)","File sharing","Time slicing"],a:1},
+{q:"With socket.recvfrom(1024), what kind of socket is being used?",o:["TCP socket","UDP socket","TAP socket","None of the given"],a:1},
+{q:"What is the use of the Mobi-Flow protocol?",o:["Enabling static SDN","Enabling SDN to incorporate mobility","Enabling Odin Master","Enabling traditional BGP"],a:1},
+{q:"What is the utility of <socket_name>.listen() during remote server access?",o:["To create a new socket","To bind the socket to connection","To wait for clients to connect","To close the connection"],a:2},
+{q:"Which is the correct direction for PACKET_OUT type messages in SDN?",o:["From controller to switch","From switch to controller","Between two switches","Between two controllers"],a:0},
+{q:"Which is a limitation of the traditional non-SDN networks?",o:["Switches do not possess routing table","Switches are unable to forward traffic","Switches do not have a global view of the network","All of the given"],a:2},
+{q:"During remote server access by Raspberry Pi as a client, the client needs?",o:["Only IP address of server","Only port number","Both server IP address and port number","Client's IP address"],a:2},
+{q:"With respect to soft time-out and hard time-out in SDN switches, which relation holds?",o:["Soft time-out >= hard time-out","Hard time-out >= soft time-out","Soft time-out = hard time-out always","None of the given"],a:1},
+{q:"Which is true regarding Traditional Network vs Software Defined Network?",o:["Traditional: Routing Table, SDN: Routing Table","Traditional: Flow Table, SDN: Routing Table","Traditional: Routing Table, SDN: Flow Table","Traditional: Flow Table, SDN: Flow Table"],a:2},
+{q:"To which SDN issue does flow rule tabular structure relate?",o:["Controller placement issue","Flow Rule placement issue","Hardware placement issue","Analysis placement issue"],a:1},
+{q:"What is the functionality of East-Westbound APIs in SDN?",o:["To communicate between controller and switches","To communicate among multiple controllers","East-Westbound APIs do not exist","To communicate between switches themselves"],a:1},
+{q:"Hierarchical SDN architecture is also known as ___ architecture.",o:["Tree","Flat","Mesh","Line"],a:0},
+{q:"Integrating SDN with IoT is not recommended.",o:["False","True"],a:0},
+{q:"What is Sensor Openflow?",o:["A traditional routing protocol","A queue management protocol","An SDN protocol tailored for IoT devices","A physical connectivity protocol"],a:2},
+{q:"How does Mobi-Flow fare in comparison to Conventional networking in message overhead?",o:["Mobi-Flow > Conventional","Mobi-Flow < Conventional","Mobi-Flow = Conventional","None of the given"],a:1},
+{q:"Virtual Machines came before Cloud Computing.",o:["True","False"],a:0},
+{q:"Private cloud services cannot provide Software-as-a-Service (SaaS).",o:["True","False"],a:1},
+{q:"Which is a solution for mobility-aware flow rule placement in SDIoT?",o:["Mobility-Flow","Mobile-Flow","Mobi-Flow","M-Flow"],a:2},
+{q:"An organization wants public and private cloud features. Which deployment model?",o:["Private Cloud","Public Cloud","Hybrid Cloud","Any of these"],a:2},
+{q:"Which is the most on-premise cloud deployment model?",o:["Private Cloud","Public cloud","IaaS","PaaS"],a:0},
+{q:"Which type of client requires constant communication with the cloud server?",o:["Thin client","Thick client","Both thin and thick clients","None of these"],a:0},
+{q:"What does 'CIA' in cloud data security stand for?",o:["Confidentiality, Integrity, Availability","Confidentiality, Inheritance, Automation","Congestion, Integrity, Authentication","Criticality, Integrity, Accountability"],a:0},
+{q:"When accessing Spotify online from browser without installing, which cloud service model is most appropriate?",o:["SaaS","PaaS","IaaS","DaaS"],a:0},
+{q:"With respect to Cloud Computing security, which are necessary?",o:["Network Level Security but not Host Level","Application Level Security but not Host Level","Host Level Security but not Network Level","All of Network, Host and Application Level Security"],a:3},
+{q:"Data security and client authentication is an issue in which cloud service models?",o:["SaaS","SaaS and PaaS","IaaS","All of them"],a:3},
+{q:"What is the role of a Hypervisor?",o:["To facilitate installation of a router","To provide a platform for executing virtual machines","To facilitate sensor fabrication","To communicate between switches themselves"],a:1},
+{q:"Which of the following is a limitation of SaaS?",o:["Remote software execution","Platform independence","Centralized control","None of these"],a:2},
+{q:"___ means independent of device or location.",o:["Scalable","Reliability","Agile","Ubiquitous"],a:3},
+{q:"Which are advantages of cloud computing?",o:["Elasticity","Pay-per-use","Self Service","All of the above"],a:3},
+{q:"Fog computing is an intermediate layer between ___ and ___.",o:["Dew and devices","Cloud and devices","Cloud and server","None of these"],a:1},
+{q:"The managerial role is played by ___ in sensor-cloud architecture.",o:["End-users","Sensor-Cloud Service Provider","Neither a nor b","Both a and b"],a:1},
+{q:"Which is not a component of OpenStack?",o:["Suse","Nova","Swift","All of these"],a:0},
+{q:"Who coined the term Fog computing?",o:["IBM","CISCO","All of these","None of these"],a:1},
+{q:"The concept of ___ enables physical hardware to be shared among multiple entities.",o:["Hardware virtualization","Software virtualization","Module virtualization","All of these"],a:0},
+{q:"OpenStack is a free open source software for cloud framework simulation.",o:["True","False"],a:0},
+{q:"In IoT, temporal sensitivity of data DOES NOT play an important role.",o:["True","False"],a:1},
+{q:"Which is NOT a component of OpenStack?",o:["Horizon","Heat","Stellar","Neutron"],a:2},
+{q:"Which is the principal feature of sensor clouds?",o:["Sensor monitoring","Sensor instantiation","Sensor virtualization","Sensor collection"],a:2},
+{q:"The optimal composition of ___ is a management issue in sensor-cloud.",o:["Logistics","Pricing","Caching","Virtual sensor nodes"],a:3},
+{q:"How many types of caching mechanism are there in sensor cloud?",o:["1","4","2","3"],a:2},
+{q:"Data transfer & processing IoT calculation: one-way = 10s, total = 25s. What is processing time x?",o:["10s","5s","15s","20s"],a:1},
+{q:"Which is true about fog computing?",o:["Fog acts as complement to cloud computing","Fog is a replacement for cloud computing","Fog and cloud computing are the same","Fog is more powerful than cloud computing"],a:0},
+{q:"Which OpenStack component do you use to access all other components?",o:["Horizon","Glance","Neutron","None of these"],a:0},
+{q:"Which are active connected entities in a holistic smart city environment?",o:["Police station","Banks","Transport centers","All of the above"],a:3},
+{q:"With the help of ICT tools, it is possible to increase citizen participation for a good governance based smart city.",o:["True","False"],a:0},
+{q:"Which is a possible challenge with respect to smart parking lots?",o:["Efficient auto-routing of vehicles","Locating current vacant spots","Auto-charging of vehicles","All of the given"],a:3},
+{q:"What refers to combining information from multiple sensor sources?",o:["Information Collection","Multi-sensor deployment","Multi-sensor dissemination","Multi-sensor data fusion"],a:3},
+{q:"Which is one of the theory of evidence-based mathematical methods of data fusion?",o:["Belief function","Bayesian analysis","ANN","None of these"],a:0},
+{q:"With respect to data fusion from multiple IoT sensors, does outlier data present a challenge?",o:["No","Yes"],a:1},
+{q:"Which is a phase of ICV development?",o:["Based on 2G","Based on 4G LTE","Vehicles connected to cloud","All of these"],a:3},
+{q:"With which can the decision-making gap between sensors and actuators be bridged?",o:["SDN","OpenStack Horizon","Artificial Intelligence (AI)","Arduino IDE"],a:2},
+{q:"Which statements are true about HAN standards?\nI: Physical and MAC layers defined by IEEE802.15.4\nII: Network layer defined by Zigbee\nIII: Application layer defined by IEEE802.15.4",o:["Statements I and II","Statements I and III","Statements II and III","Statements I, II and III"],a:0},
+{q:"What is UPnP?",o:["Uninterrupted Post-messaging","Universal Pull Streaming","Universal Plug and Play","Unhindered Public Networking"],a:2},
+{q:"What are the disadvantages of V2X communication?",o:["Increased traffic safety","Tracking of movement","Efficient use of fuel","None of these"],a:1},
+{q:"Mobility of vehicles in V2X limits which of the following restricting TCP/IP use?",o:["Communication between vehicular infrastructure","Localization of data","Backbone routing in IP core networks","Human-vehicle interaction"],a:1},
+{q:"In VANET, link durations are long and easily scaled-up.",o:["True","False"],a:1},
+{q:"CCN is derived from ICN architecture.",o:["True","False"],a:0},
+{q:"In an ICV environment, efficient cooperation between vehicles on a highway can lead to safer scenario regarding collision.",o:["True","False"],a:0},
+{q:"Which is the most probable application scenario for a smart grid?",o:["Home automation","Hospital networks","Intelligent power plants","Crop monitoring"],a:2},
+{q:"With respect to smart grid, which stakeholders are benefitted?",o:["Energy Service providers","Energy consumers/customers","Both energy service providers and consumers","Neither"],a:2},
+{q:"It is not possible to perform load forecasting using a smart grid.",o:["True","False"],a:1},
+{q:"The most probable utility of IP network in Smart Grid architecture?",o:["IP network has no utility","IP network connects smart grid components globally for seamless data transfer","IP network is used for multimedia video streaming only","IP network is used to induce more congestion"],a:1},
+{q:"Smart Home is an isolated concept and is not integrable with smart grid.",o:["False","True"],a:0},
+{q:"Which is a cloud application of smart grid?",o:["Information management","Energy management","Security","All of these"],a:3},
+{q:"Which is not a vulnerability of Smart Grid?",o:["Integrity","Physical threats","Dynamic system attacks","None of these"],a:3},
+{q:"IIoT corresponds to which industrial revolution?",o:["1st","2nd","3rd","4th"],a:3},
+{q:"IIoT is inherently data intensive.",o:["Yes","No"],a:0},
+{q:"Which is a requirement and utility of IIoT?",o:["Power plant interruption","Power plant virtualization","Power plant decentralization","Power plant denotification"],a:1},
+{q:"Smart Grid follows which type of flow of energy?",o:["Bidirectional","Unidirectional","Both a and b","Neither a nor b"],a:0},
+{q:"What is the Flow of data?",o:["Acquisition>Generation>Storage>Analysis","Generation>Storage>Analysis>Acquisition","Generation>Acquisition>Storage>Analysis","None of these"],a:2},
+{q:"Intelligent transport system is least likely to render which connectivity?",o:["Vehicle-to-vehicle connectivity","Vehicle-to-sensor connectivity","Vehicle-to-road infrastructure","Vehicle-to-home connectivity"],a:3},
+{q:"Approximately ___ of the total data available in the world is unstructured.",o:["20%","40%","60%","80%"],a:3},
+{q:"SQL manages ___ data.",o:["Unstructured","Corrupt","Structured","Non-organized"],a:2},
+{q:"Qualitative analysis refers to the process by which numerical data is analyzed.",o:["True","False"],a:1},
+{q:"Which data analysis technique involves the study of difference of variance?",o:["ARIMA","ANOVA","DNN","OpenFlow"],a:1},
+{q:"Given independent variable, to predict dependent variable based on the relationship between two variables, which technique would you use?",o:["ANOVA","ARIMA","Regression Analysis","Pre-analysis"],a:2},
+{q:"How many logical layers are in AgriSens architecture?",o:["Perception Layer","Processing Layer","Application Layer","All of the given"],a:3},
+{q:"AgriSens supports real-time monitoring of soil moisture conditions.",o:["False","True"],a:1},
+{q:"What is the data aggregator also known as in IoT smart healthcare?",o:["CPU","LPU","APU","PPU"],a:1},
+{q:"The effect size for statistical significance is the standardized ___ difference between two groups.",o:["Median","Mean","Inter quartile range","None of the above"],a:1},
+{q:"Processing the sensed data on the device itself is known as ___ approach.",o:["Network based","In-place","Out of the place","None of these"],a:1},
+{q:"Processing handheld activity data with AI can be used for ___.",o:["Fall detection","Heart rate detection","Vehicle detection","All of these"],a:0},
+{q:"Which is an assumption of ANOVA?",o:["Homogeneity of variances","Normally distributed response variable","Independence of observations","All of these"],a:3},
+{q:"Select the statement(s) that denote the type of ANOVA.\nI: One way analysis\nII: Two way analysis\nIII: K-way analysis",o:["Statement I","Statement II","Statements I, II, and III","None of these"],a:2},
+{q:"AmbuSense is a privacy-aware system.",o:["True","False"],a:0},
+{q:"The two most relevant sensors directly used in agriculture are ___.",o:["Soil moisture and ECG sensor","Soil moisture and water level sensor","ECG sensor and water level sensor","All of these"],a:1},
+{q:"Examples of dispersion measures include ___ and ___.",o:["Discrete, categorical","Continuous, quantitative","Discrete, quantitative","Range, Variance"],a:3},
+{q:"If your smartphone tilts by 15 degrees, which sensor detects this tilt?",o:["HC-SR04","Gyroscope","Accelerometer","Monometer"],a:1}
+],
+"2026": [
+{q:"What is the full form of IoT?",o:["Internet of Tasks","Internet of Articles","Internet of Taps","None of these"],a:3},
+{q:'The "Source Address" field in the IPv6 header is of ___ bits in length.',o:["32","64","128","None of these"],a:2},
+{q:"Which of the following is/are not an enabler of IoT?",o:["RFID","Sensors and Actuators","Cloud Computing","None of these"],a:3},
+{q:"The gateway is tasked with assigning a unique address to each field device within its jurisdiction.",o:["True","False"],a:0},
+{q:"The increasing number of devices in IoT is expected to result in an address crunch.",o:["True","False"],a:0},
+{q:"In ___ a node/network is connected to multiple networks for improved reliability.",o:["Transparent roaming","Multi-coulding","None of these","Both (a) and (b)"],a:2},
+{q:"Which of the following is NOT a function of an IoT Gateway?",o:["Connects the IoT LAN to a WAN","Can implement several LAN and WAN","Both (a) and (b)","Neither (a) Nor (b)"],a:3},
+{q:"Which statements is/are incorrect?\nI: An actuator moves or controls the mechanism.\nII: An actuator requires a control signal and a source of energy.",o:["Statement I is incorrect","Statement II is incorrect","Both statements are incorrect","Both statements are correct"],a:3},
+{q:"Which of the following is NOT a function of an IoT LAN?",o:["Long range communication, global","World wide connections","Both (a) and (b)","Neither (a) Nor (b)"],a:2},
+{q:'The word "Transducer" is a collective term used for both Sensors and Actuators.',o:["True","False"],a:0},
+{q:"Analog Sensors produce a discontinuous output signal or voltage, generally proportional to the quantity being measured.",o:["True","False"],a:1},
+{q:"If the output signal differs from the correct value by a constant, the sensor has an ___.",o:["Offset error","Bias","Both (a) and (b)","None of these"],a:2},
+{q:"Pneumatic actuators enable the production of large forces from a relatively larger pressure changes.",o:["False","True"],a:0},
+{q:"A sensor node is made up of which of the following?",o:["Sensor/Sensors","A processing unit","A power unit","All of these"],a:3},
+{q:"What is the full form of SMP in the context of IoT actuators?",o:["Shape Memory Polymers","Shape Master Polymers","Switch Mode Power","Sensor Making Polymer"],a:0},
+{q:"The full form of MQTT is",o:["Message Query Telemetry Transport","Message Queue Telemetry Transport","Message Queue Telemedicine Transport","None of these"],a:1},
+{q:"XMPP uses the ___ architecture.",o:["Publish-subscribe","Client-server","Both (a) and (b)","Neither (a) nor (b)"],a:1},
+{q:"With respect to AMQP, which message delivery guarantees allow each message to be delivered certainly but may be delivered multiple times?",o:["At-least-once","At-most-once","Exactly-once","Both (a) and (b)"],a:0},
+{q:"In MQTT for IoT, the Publishers are ___.",o:["Lightweight sensors","Actuators","Processing units","None of these"],a:0},
+{q:"Which of the following is NOT a method in MQTT?",o:["Publish","Connect","Disconnect","None of these"],a:3},
+{q:"CoAP has ___ modes for messaging.",o:["2","4","8","None of these"],a:1},
+{q:"CoAP architecture is divided into three sub-layers with the last one for user registration.",o:["True","False"],a:1},
+{q:"What is the full form of XMPP in IoT?",o:["Extensible Markup Page Processing","Extensible Messaging and Presence Protocol","Both (a) and (b)","Neither (a) nor (b)"],a:1},
+{q:"XMPP is not an open standard protocol.",o:["False","True"],a:0},
+{q:"What is/are not frame types of the AMQP protocol?",o:["Origin","Destination","Advance","All of these"],a:3},
+{q:"What is the basic unit of data in the AMQP protocol?",o:["Chunk","Byte","Packet","None of these"],a:3},
+{q:"Which of the following is/are exchange types in AMQP?",o:["Direct","Fan-out","Topic","All of these"],a:3},
+{q:"Which of the following is/are not an application of 6LoWPAN?",o:["IoT","IIoT","Both (a) and (b)","Neither (a) nor (b)"],a:3},
+{q:"The OSI model has ___ layers.",o:["6","9","4","None of these"],a:3},
+{q:'The "Destination Address" in the IPv4 packet represents which of the following?',o:["The destination node address of the packet","The intermediate hop in the network","Both (a) and (b)","None of these"],a:0},
+{q:"There is no network layer in Wired HART.",o:["True","False"],a:0},
+{q:"Zwave operates at ___ MHz in the US and ___ MHz in Europe.",o:["1008, 989","908.42, 868.42","767.56, 855.28","None of these"],a:1},
+{q:"Dumb behavior of sensor nodes is ___ in nature.",o:["Temporal","Spatial","Both (a) and (b)","None of these"],a:0},
+{q:"The process of identifying channels consistently affected by interference and removing them is known as ___.",o:["Channel Trimming","Channel Flushing","Both (a) and (b)","None of these"],a:3},
+{q:"The full form of NFC is",o:["Near Field Contact","Near Field Communication","Both (a) and (b)","Neither (a) nor (b)"],a:1},
+{q:"NFC works on the principle of magnetic induction.",o:["True","False"],a:0},
+{q:"NFC tags found in supermarket products are examples of active NFC.",o:["True","False"],a:1},
+{q:"Bluetooth is based on ___.",o:["Nanonets","Binarynets","Both (a) and (b)","None of these"],a:3},
+{q:"A ___ in NFC emits a small electric current which creates a magnetic field.",o:["reader","writer","destroyer","None of these"],a:0},
+{q:"Bluetooth technology is based on Ad-hoc network technology.",o:["False","True"],a:1},
+{q:"Zwave utilizes GFSK modulation and Hongkong channel encoding.",o:["True","False"],a:1},
+{q:"The process of bypassing radio dead-spots is done using a message called ___ in Zwave.",o:["Ping","Healing","Frame","None of these"],a:1},
+{q:"Sensor nodes have unlimited battery life.",o:["True","False"],a:1},
+{q:"The Link Manager Protocol in Bluetooth manages the establishment, authentication, link configuration.",o:["True","False"],a:0},
+{q:"Zigbee commonly uses ___ data rate.",o:["250 kbps","250 Mbps","260 kbps","260 Mbps"],a:0},
+{q:"Instead of a PIR sensor, a camera can also be used in the agricultural field to detect intruders.",o:["True","False"],a:0},
+{q:"An ultrasonic sensor senses the ___ at which the object is located.",o:["distance","coordinates","Both (a) and (b)","None of these"],a:0},
+{q:"WMSNs can be used for",o:["Security surveillance","Wild-habitat monitoring","Environmental monitoring","All of these"],a:3},
+{q:"Objective of coverage in WSN is to use minimum number of sensors and maximize network lifetime.",o:["True","False"],a:0},
+{q:"What is the full form of AUV in mobile wireless sensor networks?",o:["Aerial and Underwater Vehicle","Ambient and Underprivileged Vehicle","Astral Underwater Vehicle","None of these"],a:3},
+{q:"In the localized coverage algorithm, only one subset of nodes participates in sensing, communication, and computation.",o:["True","False"],a:0},
+{q:"Which is/are advantage(s) of Stationary Wireless Sensor Networks?",o:["Easy deployment","Easy topology maintenance","Both (a) and (b)","None of these"],a:2},
+{q:"In Human-centric Sensing, humans can act as Sensor Operators?",o:["True","False"],a:0},
+{q:"Which is not a property of MANET?",o:["Self-CHOP","Self-HOP","Both (a) and (b)","None of these"],a:3},
+{q:"UAV networks provide a solution for deployments where there is a need for frequent change configurations.",o:["False","True"],a:1},
+{q:"Which is NOT a feature of mesh topology in UAV system?",o:["Flexible","Reliable","None of these","Both (a) and (b)"],a:2},
+{q:"Which is not a property of a FANET?",o:["Inter-plane communication","Intra-plane communication","Both (a) and (b)","None of these"],a:3},
+{q:"M2M networks are characterized by a few number of sensor nodes deployed over a large area.",o:["False","True","Cannot be determined"],a:0},
+{q:"What is the full form of M2SP in Machine-to-Machine Communication?",o:["M2M Stateless Platform","M2M Session Packet","M2M Secure Packaging","None of these"],a:3},
+{q:"The ___ provides integrated services based on device collected data-sets.",o:["M2M Application Platform","M2M Service Platform","M2M Hardware Platform","None of these"],a:0},
+{q:'What does "Interoperability" refer to in IoT?',o:["The ability to operate without power","The ability of different systems to work together without restrictions","The ability to increase the speed of the internet","None of these"],a:1},
+{q:"In the Cosine theory for interoperability, an object is defined as (A,B,C,D). What does 'C' represent?",o:["The natural language used","The internal identifier","The context of A","The definition of the object"],a:2},
+{q:'Which best describes "Syntactic Interoperability" challenge?',o:["Devices having different physical shapes","Devices using different message formats and data structures","Devices located in different countries","Devices having different owners"],a:1},
+{q:"Which is a primary reason for the popularity of Arduino in IoT?",o:["It is highly expensive and exclusive","It is low resource-consuming and cheap","It requires high-power external cooling","It only supports digital signals"],a:1},
+{q:"What is the clock speed of the Arduino Uno board?",o:["8 MHz","32 MHz","16 MHz","50 MHz"],a:2},
+{q:"Which function is used to iteratively loop over instances in an Arduino sketch?",o:["setup()","main()","loop()","start()"],a:2},
+{q:"In Arduino, what is the default starting index for an array?",o:["1","-1","0","10"],a:2},
+{q:"What does the delay(5000) command do?",o:["Resets the Arduino board","Introduces a delay of 5 seconds","Turns off all LEDs immediately","Skips the current execution loop"],a:1},
+{q:"Which header file must be called to use mathematical functions like sin() or cos()?",o:["arduino.h","math.h","sensor.h","stdio.h"],a:1},
+{q:"The DHT22 sensor is used for measuring which physical quantities?",o:["Pressure and Altitude","Light and Sound","Humidity and Temperature","Motion and Direction"],a:2},
+{q:"What is the recommended voltage range for the VCC pin of a DHT sensor?",o:["1V to 2V","3.3V to 5V","12V to 24V","0V to 1V"],a:1},
+{q:"When integrating a DHT sensor with Arduino, which pin receives the sensor's data?",o:["Ground (GND)","Signal/data pin","5V power pin","Analog input AREF"],a:1},
+{q:"Which describes the primary function of an actuator?",o:["Converts motion to energy","Converts energy or signals into motion","Stores data","Connects to the internet"],a:1},
+{q:"When using the Servo library, which function specifies the pin where the servo is connected?",o:["servo.connect()","servo.attach()","servo.pinMode()","servo.write()"],a:1},
+{q:"Which function commands the servo motor to rotate to a specific angle?",o:["servo.move(angle)","servo.rotate(angle)","servo.write(angle)","servo.turn(angle)"],a:2},
+{q:'What is the output of: x = "This is Python"; print(x[2:4])',o:["is","hi","is (with space)","Th"],a:0},
+{q:"What is the purpose of the try...except block in Python?",o:["To define a function","To create a loop","To handle exceptions and errors without crashing","To import libraries"],a:2},
+{q:"Which requirement in Python distinguishes it from many other languages for defining code blocks?",o:["It requires curly braces {}","It requires begin and end keywords","It follows rigid indentation policy","Every line must end with semicolon ;"],a:2},
+{q:"When setting up a UDP client-server in Python, why must both use the same port number?",o:["To save power","To ensure data is encrypted","To ensure client sends data to the exact endpoint where server is listening","It is not critical"],a:2},
+{q:"When using open() in 'w' mode on a file that doesn't exist, what happens?",o:["It throws a FileNotFoundError","It automatically creates the file","It opens in read-only mode","It asks for user permission"],a:1},
+{q:"Which file mode opens a file for both reading and writing in Python?",o:["rw","w","r+","a"],a:2},
+{q:"Which command expands the file system on Raspberry Pi?",o:["sudo apt-get update","sudo reboot","sudo raspi-config","ifconfig"],a:2},
+{q:"What advantage does Raspberry Pi 3 have over Pi Zero in connectivity?",o:["Pi 3 has built-in Wi-Fi and Bluetooth","Pi 3 is smaller","Pi Zero is more expensive","Pi 3 has fewer USB ports"],a:0},
+{q:"Which software is recommended for Windows to write Raspberry Pi OS image onto SD card?",o:["Rufus","Balena Etcher","Win32 Disk Imager","UNetbootin"],a:2},
+{q:"When connecting Pi camera with ribbon cable, which direction should the blue tag face?",o:["Towards the HDMI port","Towards the USB ports","Towards the Ethernet port","Towards the GPIO pins"],a:2},
+{q:"Which command captures an image directly with Pi camera in terminal?",o:["sudo apt-get install python-picamera","raspistill -o image_name.jpg","python camera_capture.py","picamera.capture('image.jpg')"],a:1},
+{q:"What is the purpose of GPIO.setmode(GPIO.BOARD)?",o:["To set GPIO pins to output mode","To initialize time functions library","To specify pin numbering follows physical board layout","To clear GPIO settings"],a:2},
+{q:"Which command installs the Adafruit DHT library on Raspberry Pi?",o:["sudo apt-get install python","sudo python setup.py install","install dht_library","pip install dht"],a:1},
+{q:"Which pin numbering does the Adafruit DHT library automatically use?",o:["GPIO.BOARD","WiringPi","BCM (Broadcom SOC Channel)","Physical Pin Numbering"],a:2},
+{q:"In a DHT Sensor, ground is connected to which pin number?",o:["1","2","3","4"],a:3},
+{q:"What is the purpose of socket.bind() on the server side?",o:["To connect to a remote server","To associate the socket with a network interface and port number","To listen for incoming connections","To close the socket connection"],a:1},
+{q:"Which Python library integrates the DHT sensor with Raspberry Pi?",o:["NumPy","Adafruit_DHT","Matplotlib","Pandas"],a:1},
+{q:"In the client-server architecture, what type of socket is used for data transmission?",o:["TCP Socket","UDP Socket","Raw Socket","None of these"],a:1},
+{q:"Which function splits a string into a list of substrings in Python?",o:["string.cut()","string.divide()","string.split()","string.break()"],a:2},
+{q:"Which Python library is used for data plotting?",o:["PyGame","Matplotlib","TensorFlow","Scikit-learn"],a:1},
+{q:"Which function enables the interactive plot mode?",o:["grid()","show()","ion()","subplot()"],a:2},
+{q:"The interface between Control Plane and Data Plane in SDN is known as:",o:["Northbound API","Southbound API","Eastbound API","Westbound API"],a:1},
+{q:"Flow tables in SDN switches are stored in which type of memory?",o:["RAM","ROM","TCAM","Flash"],a:2},
+{q:"Which is NOT an attribute or component of SDN?",o:["Controller","Applications","Hardware switches","None of these"],a:3},
+{q:"Which API terminology refers to communication between multiple controllers?",o:["Northbound API","Southbound API","East-Westbound API","None of these"],a:2},
+{q:"What is the typical delay in new rule placement if the rule is not in the switch's flow table?",o:["1 to 2 milliseconds","3 to 5 milliseconds","10 to 15 milliseconds","100 milliseconds"],a:1},
+{q:"How many requests per second can a typical single-threaded SDN controller handle?",o:["100","200","500","1000"],a:1},
+{q:"What is SDN-WISE?",o:["A hardware component for sensors","A Software Defined WSN platform with flow table at sensor nodes","A database management system","A type of cloud storage"],a:1},
+{q:"How does the Packet Delivery Ratio (PDR) in Soft-WSN compare to traditional WSN?",o:["PDR is lower in Soft-WSN","PDR is significantly improved (higher) in Soft-WSN","PDR remains exactly the same","Soft-WSN does not support packet delivery"],a:1},
+{q:'In "Software Defined IoT", where are flow classification and enhanced security handled?',o:["At the physical sensor nodes","At the Data Center Networks","At the gateways only","At the user's mobile device"],a:1},
+{q:"Which architecture proposes the use of an agent at access points to communicate with the controller in SD Mobile Networks?",o:["uFlow","Odin","MobileFlow","OpenFlow"],a:1},
+{q:"Which solution was proposed by the SWAN group for mobility-aware flow rule placement?",o:["Odin","uFlow","MobileFlow","Soft-WSN"],a:2},
+{q:"In SD Data Center Networking, which flow type requires exact match rules?",o:["Mice flow","Elephant flow","Cheetah flow","Tortoise flow"],a:1},
+{q:"Cloud computing is best described as using computing as a:",o:["Utility","Product","Protocol","None of these"],a:0},
+{q:"Which is NOT an essential characteristic of Cloud Computing?",o:["Rapid Elasticity","Measured Service","Resource Pooling","Fixed Resource Allocation"],a:3},
+{q:"Which deployment model is restricted to a single organization?",o:["Public Cloud","Private Cloud","Hybrid Cloud","Community Cloud"],a:1},
+{q:"In which service model are Applications and Data managed by the user, while Runtime, Middleware, OS managed by provider?",o:["SaaS","PaaS","IaaS","None of these"],a:1},
+{q:"Which service model allows customers to rent virtualized servers focusing on infrastructure?",o:["SaaS","PaaS","IaaS","XaaS"],a:2},
+{q:"Which is a limitation of the SaaS model?",o:["Cross-platform support is required","Lack of multi-tenancy","Data security and privacy concerns","High switching costs for hardware"],a:2},
+{q:"What does SLA stand for in Cloud Computing?",o:["Service Level Application","Service Level Agreement","Secure Level Access","Standard Level Agreement"],a:1},
+{q:'The "Bluepill" attack targets which component of cloud infrastructure?',o:["Web Browser","Database","Hypervisor","Network Switch"],a:2},
+{q:"Which term refers to the independent expectancy between two entities for a specific context?",o:["Trust","Reputation","Authorization","Authentication"],a:0},
+{q:"Which is a feature of the GreenCloud simulator?",o:["It allows monitoring of energy consumption","It is a closed-source paid software","It is developed by Microsoft","It does not support GUI"],a:0}
+]
+};
+
+let currentQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let answered = false;
+let activeYearSelector = null;
+
+function init() {
+  let total = 0;
+  let years = Object.keys(quizData);
+  years.forEach(y => total += quizData[y].length);
+  document.getElementById('totalQCount').textContent = total;
+  let assignments = 0;
+  years.forEach(y => assignments += Math.ceil(quizData[y].length / 15));
+  document.getElementById('totalAssignments').textContent = assignments;
+  buildYearSelectors();
+}
+
+function buildYearSelectors() {
+  ['Seq','Rand'].forEach(mode => {
+    const container = document.getElementById('yearSelector' + mode);
+    container.innerHTML = '';
+    const allBtn = document.createElement('button');
+    allBtn.className = 'year-btn';
+    allBtn.innerHTML = `All Years Combined <span class="badge">${getTotalQ()} Qs</span>`;
+    allBtn.onclick = () => startYearMode(mode === 'Seq' ? 'seq' : 'rand', 'all');
+    container.appendChild(allBtn);
+    Object.keys(quizData).forEach(year => {
+      const btn = document.createElement('button');
+      btn.className = 'year-btn';
+      btn.innerHTML = `${year} <span class="badge">${quizData[year].length} Qs</span>`;
+      btn.onclick = () => startYearMode(mode === 'Seq' ? 'seq' : 'rand', year);
+      container.appendChild(btn);
+    });
+  });
+}
+
+function getTotalQ() {
+  let t = 0;
+  Object.keys(quizData).forEach(y => t += quizData[y].length);
+  return t;
+}
+
+function toggleYearSelector(mode) {
+  const id = mode === 'seq' ? 'yearSelectorSeq' : 'yearSelectorRand';
+  const otherId = mode === 'seq' ? 'yearSelectorRand' : 'yearSelectorSeq';
+  document.getElementById(otherId).classList.remove('visible');
+  const el = document.getElementById(id);
+  el.classList.toggle('visible');
+}
+
+function startRandomAll() {
+  let all = [];
+  Object.keys(quizData).forEach(year => {
+    quizData[year].forEach(q => all.push({...q, year}));
+  });
+  shuffle(all);
+  currentQuestions = all;
+  startQuiz();
+}
+
+function startYearMode(mode, year) {
+  let qs = [];
+  if (year === 'all') {
+    Object.keys(quizData).forEach(y => {
+      quizData[y].forEach(q => qs.push({...q, year: y}));
+    });
+  } else {
+    quizData[year].forEach(q => qs.push({...q, year}));
+  }
+  if (mode === 'rand') shuffle(qs);
+  currentQuestions = qs;
+  startQuiz();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function startQuiz() {
+  currentIndex = 0;
+  score = 0;
+  answered = false;
+  showScreen('quizScreen');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = currentQuestions[currentIndex];
+  answered = false;
+  document.getElementById('yearBadge').textContent = q.year;
+  document.getElementById('progressText').textContent = `${currentIndex + 1} / ${currentQuestions.length}`;
+  document.getElementById('liveScore').textContent = score;
+  document.getElementById('progressBar').style.width = ((currentIndex) / currentQuestions.length * 100) + '%';
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('feedbackStrip').style.display = 'none';
+  const list = document.getElementById('optionsList');
+  list.innerHTML = '';
+  const labels = ['A','B','C','D','E','F'];
+  q.o.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-label">${labels[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectOption(i);
+    btn.id = 'opt-' + i;
+    list.appendChild(btn);
+  });
+  document.getElementById('nextBtn').disabled = true;
+}
+
+function selectOption(idx) {
+  if (answered) return;
+  answered = true;
+  const q = currentQuestions[currentIndex];
+  const isCorrect = idx === q.a;
+  if (isCorrect) score++;
+  document.getElementById('liveScore').textContent = score;
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if (i === q.a) btn.classList.add('correct');
+    if (i === idx && !isCorrect) btn.classList.add('wrong');
+  });
+  const fb = document.getElementById('feedbackStrip');
+  fb.style.display = 'block';
+  if (isCorrect) {
+    fb.className = 'feedback-strip correct-fb';
+    fb.textContent = '✓ Correct!';
+  } else {
+    fb.className = 'feedback-strip wrong-fb';
+    const labels = ['A','B','C','D','E','F'];
+    fb.textContent = `✗ Wrong — Correct answer: ${labels[q.a]}. ${q.o[q.a]}`;
+  }
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex >= currentQuestions.length) {
+    showResults();
+  } else {
+    const card = document.querySelector('.question-card');
+    card.style.animation = 'none';
+    card.offsetHeight;
+    card.style.animation = 'fadeSlide 0.4s ease';
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  showScreen('resultsScreen');
+  const total = currentQuestions.length;
+  const pct = Math.round((score / total) * 100);
+  const wrong = total - score;
+  let cls = 'green';
+  if (pct < 70) cls = 'yellow';
+  if (pct < 40) cls = 'red';
+  document.getElementById('scoreBig').textContent = pct + '%';
+  document.getElementById('scoreBig').className = 'score-big ' + cls;
+  const ring = document.getElementById('ringFill');
+  ring.className = 'ring-fill ' + cls;
+  const circumference = 2 * Math.PI * 80;
+  const offset = circumference - (pct / 100) * circumference;
+  setTimeout(() => ring.style.strokeDashoffset = offset, 100);
+  document.getElementById('rCorrect').textContent = score;
+  document.getElementById('rWrong').textContent = wrong;
+  document.getElementById('rTotal').textContent = total;
+  let title, sub;
+  if (pct >= 90) { title = '🏆 Outstanding!'; sub = 'You truly know your IoT concepts!'; }
+  else if (pct >= 70) { title = '🎉 Great Job!'; sub = 'Solid understanding of the material.'; }
+  else if (pct >= 50) { title = '👍 Good Effort!'; sub = 'Keep studying to improve your score.'; }
+  else { title = '📚 Keep Learning!'; sub = 'Review the lectures and try again.'; }
+  document.getElementById('resultsTitle').textContent = title;
+  document.getElementById('resultsSubtitle').textContent = sub;
+}
+
+function restartQuiz() {
+  shuffle(currentQuestions);
+  startQuiz();
+}
+
+function goHome() {
+  showScreen('homeScreen');
+  document.querySelectorAll('.year-selector').forEach(el => el.classList.remove('visible'));
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+init();
+</script>
+</body>
+</html>
